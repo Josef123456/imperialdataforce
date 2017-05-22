@@ -46,6 +46,8 @@ for artist in artists:
     # append dictionary to list
     artist_data.append(d)
 
+df = pd.DataFrame(artist_data)
+df.to_csv('artist_add_data.csv', index = False)
 ### 3. Extract Comment data
 
 """"
@@ -53,32 +55,15 @@ The user ids in the dataset do not correspond to real user uds, thus we cannot
 attribute comments to users.
 """
     
-### 4. Extract Track data
+# Add extra artist data to initial training and test set
+extra_artist = pd.read_csv('artist_add_data.csv')
 
-# create a set with all unique tracks' IDs
-medias = set(train.media_id).union(test.media_id)
+train_extra = pd.merge(train, extra_artist, on = 'artist_id', sort = False)
+test_extra = pd.merge(test, extra_artist, on = 'artist_id', sort = False)
 
-media_data = []
-for media in medias:
-    # for each media create a dict with:
-    # media_id, rank, release_date
-    d = {'media_id':media}
-    # if any of these attributes is missing, fill with None value
-    for att in ['rank', 'release_date']:
-        try:
-            val = api.get(endpoint = 'track', id_ = str(media))[att]
-        except:
-            val = None
-        # add to dictionary
-        d[att] = val
-    # append dictionary to list
-    media_data.append(d)
-
-
-
-
-
-
+# write new datasets to .csv files 
+train_extra.to_csv('DATA/train_extra.csv', index = False)
+test_extra.to_csv('DATA/test_extra.csv', index = False)
 
 
 
